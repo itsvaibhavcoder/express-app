@@ -1,76 +1,20 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import express from 'express';
+import mongoose from 'mongoose';
+import userRoutes from './routes/user';
 
-import express, { Application } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
+const app = express();
 
-import routes from './routes';
-import Database from './config/database';
-import ErrorHandler from './middlewares/error.middleware';
-import Logger from './config/logger';
+app.use(express.json());
 
-import morgan from 'morgan';
+// MongoDB Connection
+mongoose.connect('mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+2.3.0', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+}).then(() => console.log('MongoDB connected'))
+  .catch(err => console.log(err));
 
-class App {
-  public app: Application;
-  public host: string | number;
-  public port: string | number;
-  public api_version: string | number;
-  public env: boolean;
-  private db = new Database();
-  private logStream = Logger.logStream;
-  private logger = Logger.logger;
-  public errorHandler = new ErrorHandler();
+app.use('/api/users', userRoutes);
 
-  constructor() {
-    this.app = express();
-    this.host = process.env.APP_HOST;
-    this.port = process.env.APP_PORT;
-    this.api_version = process.env.API_VERSION;
+const PORT = process.env.PORT || 5000;
 
-    this.initializeMiddleWares();
-    this.initializeRoutes();
-    this.initializeDatabase();
-    this.initializeErrorHandlers();
-    this.startApp();
-  }
-
-  public initializeMiddleWares(): void {
-    this.app.use(cors());
-    this.app.use(helmet());
-    this.app.use(express.urlencoded({ extended: true }));
-    this.app.use(express.json());
-    this.app.use(morgan('combined', { stream: this.logStream }));
-  }
-
-  public initializeDatabase(): void {
-    this.db.initializeDatabase();
-  }
-
-  public initializeRoutes(): void {
-    this.app.use(`/api/${this.api_version}`, routes());
-  }
-
-  public initializeErrorHandlers(): void {
-    this.app.use(this.errorHandler.appErrorHandler);
-    this.app.use(this.errorHandler.genericErrorHandler);
-    this.app.use(this.errorHandler.notFound);
-  }
-
-  public startApp(): void {
-    this.app.listen(this.port, () => {
-      this.logger.info(
-        `Server started at ${this.host}:${this.port}/api/${this.api_version}/`
-      );
-    });
-  }
-
-  public getApp(): Application {
-    return this.app;
-  }
-}
-
-const app = new App();
-
-export default app;
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
