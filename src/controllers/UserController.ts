@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { validationResult } from 'express-validator';
 import User from '../models/User';
 
@@ -30,17 +29,8 @@ class UserController {
 
       await user.save();
 
-      const payload = {
-        user: {
-          id: user.id,
-        },
-      };
-
-      const token = jwt.sign(payload, 'your_jwt_secret', {
-        expiresIn: '1h',
-      });
-
-      res.status(201).json({ token });
+      // Return a success message instead of generating a token
+      res.status(201).json({ msg: 'User registered successfully' });
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
