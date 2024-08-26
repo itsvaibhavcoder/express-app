@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
+import dotenv from 'dotenv';
 import bcrypt from 'bcryptjs';
+dotenv.config();
 import { validationResult } from 'express-validator';
+import jwt from 'jsonwebtoken';
 import User from '../models/User';
+
 
 class UserController {
   public async register(req: Request, res: Response): Promise<void> {
@@ -12,7 +16,7 @@ class UserController {
     }
 
     const { firstName, lastName, email, password } = req.body;
-
+    
     try {
       let user = await User.findOne({ email });
       if (user) {
@@ -64,8 +68,8 @@ class UserController {
           id: user.id,
         },
       };
-
-      const token = jwt.sign(payload, 'your_jwt_secret', {
+      const SECRETE_KEY = process.env.JWT_SECRETE_KEY
+      const token = jwt.sign(payload, SECRETE_KEY, {
         expiresIn: '1h',
       });
 
