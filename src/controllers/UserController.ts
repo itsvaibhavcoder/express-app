@@ -1,84 +1,45 @@
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
-import bcrypt from 'bcryptjs';
 dotenv.config();
-import { validationResult } from 'express-validator';
-import jwt from 'jsonwebtoken';
-import User from '../models/User';
+import UserService from '../services/user.service';
+import HttpStatus from "http-status-codes";
+class UserController{
+  public UserService = new UserService();
 
-
-class UserController {
-  public async register(req: Request, res: Response): Promise<void> {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-      return;
-    }
-
-    const { firstName, lastName, email, password } = req.body;
-    
-    try {
-      let user = await User.findOne({ email });
-      if (user) {
-        res.status(400).json({ msg: 'User already exists' });
-        return;
-      }
-
-      user = new User({
-        firstName,
-        lastName,
-        email,
-        password: await bcrypt.hash(password, 10),
+  public signUp = async(req: Request, res:Response, next: NextFunction): Promise<any>=>{
+    try{
+      const data = await this.UserService.signUp(req.body);
+      res.status(HttpStatus.CREATED).json({
+        code: HttpStatus.CREATED,
+        data: data,
+        message: 'User created successfully'
       });
-
-      await user.save();
-
-      // Return a success message instead of generating a token
-      res.status(201).json({ msg: 'User registered successfully' });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
+    }
+    catch(error){
+      next(error);
     }
   }
-
-  public async login(req: Request, res: Response): Promise<void> {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
-      return;
-    }
-
-    const { email, password } = req.body;
-
-    try {
-      const user = await User.findOne({ email });
-      if (!user) {
-        res.status(400).json({ msg: 'Invalid credentials' });
-        return;
-      }
-
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) {
-        res.status(400).json({ msg: 'Invalid credentials' });
-        return;
-      }
-
-      const payload = {
-        user: {
-          id: user.id,
-        },
-      };
-      const SECRETE_KEY = process.env.JWT_SECRETE_KEY
-      const token = jwt.sign(payload, SECRETE_KEY, {
-        expiresIn: '1h',
+  public userLogin = async(req: Request, res: Response, next: NextFunction) =>{
+   try{
+     const data = await this.UserService.userLogin(req.body);
+     if(data){
+         res.status(HttpStatus.OK).json({
+          code: HttpStatus.OK,
+          data: data,
+          message: 'User logged in Successfully'
+         });
+     }
+     else{
+      res.status(HttpStatus.UNAUTHORIZED).json({
+        code: HttpStatus.UNAUTHORIZED,
+        message: 'Invalid credentials'
       });
-
-      res.status(200).json({ token });
-    } catch (err) {
-      console.error(err.message);
-      res.status(500).send('Server error');
-    }
+     }
+   }
+   catch(error){
+     next(error);
+   }
   }
-}
+};
 
-export default new UserController();
+export default UserController;
