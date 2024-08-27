@@ -1,44 +1,53 @@
-import User from '../models/user.model';
+import User from '../models/User';
 import { IUser } from '../interfaces/user.interface';
+import bcrypt from 'bcryptjs';
 
 class UserService {
-
-  //get all users
-  public getAllUsers = async (): Promise<IUser[]> => {
-    const data = await User.find();
-    return data;
-  };
-
-  //create new user
-  public newUser = async (body: IUser): Promise<IUser> => {
-    const data = await User.create(body);
-    return data;
-  };
-
-  //update a user
-  public updateUser = async (_id: string, body: IUser): Promise<IUser> => {
-    const data = await User.findByIdAndUpdate(
-      {
-        _id
-      },
-      body,
-      {
-        new: true
+  // Create new user
+  public signUp = async (userDetails: IUser): Promise<IUser | { message: string }> => {
+    try {
+      if (userDetails) {
+        const hashedPassword = await bcrypt.hash(userDetails.password, 10);
+        userDetails.password = hashedPassword;
+        const data = await User.create(userDetails);
+        return data as IUser;
+      } else {
+        return {
+          message: 'Invalid details entered',
+        };
       }
-    );
-    return data;
+    } catch (error) {
+      return {
+        message: 'Error creating user: ' + error.message,
+      };
+    }
   };
 
-  //delete a user
-  public deleteUser = async (_id: string): Promise<string> => {
-    await User.findByIdAndDelete(_id);
-    return '';
-  };
+  // Login user
+  public userLogin = async (userDetails: { email: string; password: string }): Promise<IUser | { message: string }> => {
+    try {
+      const user = await User.findOne({ email: userDetails.email });
 
-  //get a single user
-  public getUser = async (_id: string): Promise<IUser> => {
-    const data = await User.findById(_id);
-    return data;
+      if (!user) {
+        return {
+          message: 'User not found',
+        };
+      }
+
+      const isPasswordValid = await bcrypt.compare(userDetails.password, user.password);
+
+      if (!isPasswordValid) {
+        return {
+          message: 'Invalid password',
+        };
+      }
+
+      return user as IUser; 
+    } catch (error) {
+      return {
+        message: 'Error logging in: ' + error.message,
+      };
+    }
   };
 }
 
