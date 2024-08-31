@@ -2,24 +2,25 @@ import mongoose from 'mongoose';
 import Logger from './logger';
 
 class Database {
-  private DATABASE_URI: string; // Renamed to match the .env variable
+  private DATABASE: string;
   private logger;
 
   constructor() {
-    // Replace database value in the .env file with your database config url
-    this.DATABASE_URI =
+    this.DATABASE =
       process.env.NODE_ENV === 'test'
-        ? process.env.DATABASE_TEST || ''
-        : process.env.DATABASE_URI || ''; // Ensure DATABASE_URI is used
+        ? process.env.DATABASE_TEST
+        : process.env.DATABASE_URI;
 
     this.logger = Logger.logger;
   }
 
   public initializeDatabase = async (): Promise<void> => {
     try {
-      await mongoose.connect(this.DATABASE_URI, {
+      await mongoose.connect(this.DATABASE, {
+        useFindAndModify: false,
+        useCreateIndex: true,
         useNewUrlParser: true,
-        useUnifiedTopology: true,
+        useUnifiedTopology: true
       });
       this.logger.info('Connected to the database.');
     } catch (error) {
@@ -27,5 +28,5 @@ class Database {
     }
   };
 }
-
+console.log(Database);
 export default Database;
