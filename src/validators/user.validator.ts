@@ -2,34 +2,33 @@ import Joi from '@hapi/joi';
 import { Request, Response, NextFunction } from 'express';
 
 class UserValidator {
-  public signUp = (req: Request, res: Response, next: NextFunction): void => {
+  public signUpValidate = (req: Request, res: Response, next: NextFunction): void => {
     const schema = Joi.object({
-      firstName: Joi.string().min(5).required(),
-      lastName: Joi.string().min(5).required(),
-      email: Joi.string().email().required(),
-      password: Joi.string().min(5).required(),
+      firstName: Joi.string().min(4).pattern(/^[A-Za-z]+$/).required(),
+      lastName: Joi.string().min(4).pattern(/^[A-Za-z]+$/)
+      .required(),
+      email: Joi.string().email().pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/).required(),
+      password: Joi.string().min(8).pattern(/^\S+$/)
+        .required()
     });
-
     const { error } = schema.validate(req.body);
     if (error) {
-      return next(error); 
+      next(error);
     }
-    next(); 
+    next();
   };
 
-  public emailValidate = (req: Request, res: Response, next: NextFunction): void => {
+  public loginValidate = (req: Request, res: Response, next: NextFunction): void => {
     const schema = Joi.object({
-      email: Joi.string().email().required(),
-      password: Joi.string().min(8).required(), 
+      email: Joi.string().email().pattern(/^[^\s@]+@[^\s@]+\.[^\s@]+$/).required(),
+      password: Joi.string().min(8).pattern(/^\S+$/).required()
     });
-
-    const { error } = schema.validate(req.body);
-    if (error) {
-      console.log("Validation Error:", error.details);
-      return next(error); 
+    const {error} = schema.validate(req.body);
+    if (error){
+      next(error);
     }
-    next(); 
-  };
+    next();
+  }
 }
 
 export default UserValidator;
