@@ -1,54 +1,41 @@
-import User from '../models/User';
+import User from '../models/user.model';
 import { IUser } from '../interfaces/user.interface';
-import bcrypt from 'bcryptjs';
-
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
 class UserService {
-  // Create new user
-  public signUp = async (userDetails: IUser): Promise<IUser | { message: string }> => {
-    try {
-      if (userDetails) {
-        const hashedPassword = await bcrypt.hash(userDetails.password, 10);
-        userDetails.password = hashedPassword;
-        const data = await User.create(userDetails);
-        return data as IUser;
-      } else {
-        return {
-          message: 'Invalid details entered',
-        };
-      }
-    } catch (error) {
-      return {
-        message: 'Error creating user: ' + error.message,
-      };
+
+  //create new user
+  public signUp = async (body: IUser): Promise<IUser> => {
+    //changes here
+    const existingUser = await User.findOne({ email: body.email });
+    if (existingUser) {
+      throw new Error('Email already exists');
     }
+
+    const data = await User.create(body);
+    return data;
   };
 
-  // Login user
-  public userLogin = async (userDetails: { email: string; password: string }): Promise<IUser | { message: string }> => {
-    try {
-      const user = await User.findOne({ email: userDetails.email });
-
-      if (!user) {
-        return {
-          message: 'User not found',
-        };
+  public Match_Email_Password = async (email: string, password: string): Promise<any> => {
+    const user = (await User.findOne({email}).exec());
+    if(user){
+      const validate = await bcrypt.compare(password, user.password);
+      if (validate){
+        return user;
       }
-
-      const isPasswordValid = await bcrypt.compare(userDetails.password, user.password);
-
-      if (!isPasswordValid) {
-        return {
-          message: 'Invalid password',
-        };
-      }
-
-      return user as IUser; 
-    } catch (error) {
-      return {
-        message: 'Error logging in: ' + error.message,
-      };
+      return false;
     }
+    return false;
   };
-}
+
+  public generateToken = async(body: Object): Promise<String> => {
+    const payload = body;
+    const secretKey = process.env.JWT_SECRET_KEY
+    const token = jwt.sign(payload, secretKey, {expiresIn: '1h'});
+    return token 
+  }
+};
 
 export default UserService;
