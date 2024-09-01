@@ -18,38 +18,57 @@ class NoteController {
                 message: 'Created the note'
                 
             });
-            next();
-        }catch(error){
+        }
+        catch(error){
             next(error);
         }
     };
 
-    public fetch = async (
+    public fetchNoteById = async(
         req: Request,
         res: Response,
         next: NextFunction
-    ):  Promise<void> => {
+    ): Promise<void>=>{
         try{
-            const fetch_note = await this.NoteService.Read(req.body);
-            if(fetch_note){
-                res.status(HttpStatus.CREATED).json({
-                    code: HttpStatus.CREATED,
-                    data: "",
-                    message: 'Fetched the note'    
-                });
-            } else{
-                res.status(HttpStatus.BAD_REQUEST).json({
-                    code: HttpStatus.BAD_REQUEST,
-                    data: "",
-                    message: 'Note not found'    
+            const noteId = req.params.id.trim()
+            const note = await this.NoteService.getSingleNote(noteId);
+
+            if(note){
+                res.status(HttpStatus.OK).json({
+                    code: HttpStatus.OK,
+                    data: note,
+                    message: "Note successfully recieved"
+                })
+            }
+            else{
+                res.status(HttpStatus.NOT_FOUND).json({
+                    code: HttpStatus.NOT_FOUND,
+                    message: "Note not found"
                 });
             }
-            next();
-        }catch(error){
-            next(error);
         }
-    };
+        catch(error){
+            next(error)
+        }
+    }
 
+    public getAll = async(
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<void>=>{
+        try{
+            const notes = await this.NoteService.getAll();
+            res.status(HttpStatus.OK).json({
+              code: HttpStatus.OK,
+              data: notes,
+              message: 'All Notes successfully recieved'
+            });
+        }
+        catch(error){
+            next(error)
+        }
+    }
     public update = async (
         req: Request,
         res: Response,
@@ -63,7 +82,6 @@ class NoteController {
                 message: 'Updated the note'
                 
             });
-            next();
         }catch(error){
             next(error);
         }
@@ -82,11 +100,28 @@ class NoteController {
                 message: 'Deleted the note'
                 
             });
-            next();
         }catch(error){
             next(error);
         }
     };
+
+    // public deleteById = async (
+    //     req: Request,
+    //     res: Response,
+    //     next: NextFunction
+    // ):  Promise<void> => {
+    //     try{
+    //         const delete_note = await this.NoteService.delete(req.body);
+    //         res.status(HttpStatus.CREATED).json({
+    //             code: HttpStatus.CREATED,
+    //             data: delete_note,
+    //             message: 'Deleted the note'
+                
+    //         });
+    //     }catch(error){
+    //         next(error);
+    //     }
+    // };
 
 }
 
