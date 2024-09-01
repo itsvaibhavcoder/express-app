@@ -9,24 +9,33 @@ class NoteService {
     const data = await Note.create(body);
     return data;
   };
-
-  // Read the present Note
-  public Read = async (body: Object): Promise<boolean> => {
-    const notes = (await Note.findOne(body).exec());
-    return notes ? true: false;
+  
+  //Get single note
+  public getSingleNote = async (id: String): Promise<INote | null> => {
+    const note = (await Note.findById(id).exec());
+    return note;
   };
 
+  // Get all notes
+  public getAll = async(): Promise<INote[]>=>{
+      const notes = await Note.find().exec();
+      return notes;
+  }
+  
   // Update the present Note
   public Update = async(body: Object): Promise<Object> => {
     const updated_Note = Note.updateOne(body);
     return updated_Note;
   }
   
-  // Delete the given Note
+  //Delete the given Note
   public delete = async(body: Object): Promise<boolean> => {
     const delete_Count = (await Note.deleteOne(body)).deletedCount;
     return delete_Count > 0;
   }
+
+  //Delete by Id
+  
 
 };
 
