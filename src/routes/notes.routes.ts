@@ -1,56 +1,69 @@
-import express, { IRouter } from 'express';
-import NoteController from '../controllers/notes.controller';
-import NoteValidator from '../validators/note.validator';
+import express, {Router} from 'express';
+import noteController from '../controllers/note.controller';
+import noteValidator from '../validators/note.validator';
 import { userAuth } from '../middlewares/auth.middleware';
 
 class NoteRoutes {
-  private NoteController = new NoteController();
-  private router = express.Router();
-  private NoteValidator = new NoteValidator();
-  
-  constructor() {
-    this.routes();
-  }
+    private NoteController = new noteController();
+    private router = express.Router();
+    private NoteValidater = new noteValidator();
 
-  private routes = () => {
+    constructor(){
+        this.routes();
+    }
 
-    //Creating new note
-    this.router.post(
-      '/create',
-      userAuth,
-      this.NoteValidator.createNote,
-      this.NoteController.createNote
-    );[]
+    private routes = () => {
 
-    // Route to get a note by ID
-    this.router.get(
-      '/get/:id',
-      userAuth,
-      this.NoteValidator.getNoteById,
-      this.NoteController.getNoteById
-    );
+        //Create the single note
+        this.router.post(
+            '/create',
+            userAuth,
+            this.NoteValidater.note_check,
+            this.NoteController.create
+        );
+        
+        //get the note by id not required useAuth
+        this.router.get(
+            '/getById/:id',
+            this.NoteValidater.note_check,
+            this.NoteController.fetchNoteById
+        );
+        
+        //get all notes
+        this.router.get(
+            '/getAll',
+            userAuth,
+            this.NoteValidater.note_check,
+            this.NoteController.getAll
+        )
 
-    // Route to update a note by ID
-    this.router.put(
-      '/update/:id',
-      userAuth,
-      this.NoteValidator.updateNote,
-      this.NoteController.updateNoteById
-    );
+        //update note
+        this.router.put(
+            '/update',
+            userAuth,
+            this.NoteValidater.note_check,
+            this.NoteController.update
+        );
+        
+        //delete note
+        this.router.delete(
+            '/del',
+            userAuth,
+            this.NoteValidater.note_check,
+            this.NoteController.delete
+        );
 
-    // Route to delete a note by ID
-    this.router.delete(
-      '/delete/:id',
-      userAuth,
-      this.NoteValidator.deleteNote,
-      this.NoteController.deleteNoteById
-    );
-  };
+        // this.router.delete(
+        //     '/delById/:id',
+        //     userAuth,
+        //     this.NoteValidater.note_check,
+        //     this.NoteController.deleteById
+        // )
+    }
 
-  public getRoutes = (): IRouter => {
-    return this.router;
-  };
+    public getRoutes = (): Router => {
+        return this.router;
+    };
 }
 
 export default NoteRoutes;
-
