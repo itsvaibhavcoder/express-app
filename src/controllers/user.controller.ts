@@ -16,11 +16,15 @@ class UserController {
         code: HttpStatus.CREATED,
         data: rest_data,
         message: 'User Registered'
-      });
-      next();
+      }); //next();
+    
     } 
     catch (error) {
-      next(error);
+      res.status(HttpStatus.BAD_REQUEST).json({
+        code: HttpStatus.BAD_REQUEST,
+        data: "",
+        message: error.message
+      });
     }
   };
 
@@ -30,7 +34,7 @@ class UserController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const user = await this.UserService.Match_Email_Password(req.body.email, req.body.password);
+      const user = await this.UserService.MatchCredential(req.body.email, req.body.password);
       if(user){
         const generate_Token = await this.UserService.generateToken(req.body);
         const {firstName, email, ...rest_data} = user;
@@ -53,8 +57,12 @@ class UserController {
       }
     }
     catch(error){
-      next(error);
-    }
+      res.status(HttpStatus.BAD_REQUEST).json({
+        code: HttpStatus.BAD_REQUEST,
+        data: "",
+        message: 'Invalid Email or Password.'
+      });
+     }
     }
   };
 

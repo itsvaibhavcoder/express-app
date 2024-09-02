@@ -8,7 +8,6 @@ class UserService {
 
   //create new user
   public signUp = async (body: IUser): Promise<IUser> => {
-    //changes here
     const existingUser = await User.findOne({ email: body.email });
     if (existingUser) {
       throw new Error('Email already exists');
@@ -18,7 +17,7 @@ class UserService {
     return data;
   };
 
-  public Match_Email_Password = async (email: string, password: string): Promise<any> => {
+  public MatchCredential = async (email: string, password: string): Promise<any> => {
     const user = (await User.findOne({email}).exec());
     if(user){
       const validate = await bcrypt.compare(password, user.password);

@@ -13,19 +13,18 @@ class NoteRoutes {
     }
 
     private routes = () => {
-
         //Create the single note
         this.router.post(
-            '/create',
+            '',
             userAuth,
-            this.NoteValidater.note_check,
-            this.NoteController.create
+            this.NoteValidater.validate_note,
+            this.NoteController.createNote
         );
         
         //get the note by id not required useAuth
         this.router.get(
-            '/getById/:id',
-            this.NoteValidater.note_check,
+            '/:id',
+            this.NoteValidater.validate_note,
             this.NoteController.fetchNoteById
         );
         
@@ -33,7 +32,7 @@ class NoteRoutes {
         this.router.get(
             '/getAll',
             userAuth,
-            this.NoteValidater.note_check,
+            this.NoteValidater.validate_note,
             this.NoteController.getAll
         )
 
@@ -41,24 +40,25 @@ class NoteRoutes {
         this.router.put(
             '/update',
             userAuth,
-            this.NoteValidater.note_check,
+            this.NoteValidater.validate_note,
             this.NoteController.update
         );
         
-        //delete note
-        this.router.delete(
-            '/del',
+        //Update note by Id
+        this.router.put(
+            '/update/:id',
             userAuth,
-            this.NoteValidater.note_check,
-            this.NoteController.delete
+            this.NoteValidater.validate_note,
+            this.NoteController.updateById
         );
-
-        // this.router.delete(
-        //     '/delById/:id',
-        //     userAuth,
-        //     this.NoteValidater.note_check,
-        //     this.NoteController.deleteById
-        // )
+        
+        //delete by id
+        this.router.delete(
+            '/:id',
+            userAuth,
+            this.NoteValidater.validate_note,
+            this.NoteController.deleteById
+        )
     }
 
     public getRoutes = (): Router => {

@@ -5,7 +5,7 @@ import { INote } from '../interfaces/note.interface';
 class NoteService {
 
   //create new Note
-  public Add = async (body: INote): Promise<Object> => {
+  public createNote = async (body: INote): Promise<Object> => {
     const data = await Note.create(body);
     return data;
   };
@@ -28,14 +28,21 @@ class NoteService {
     return updated_Note;
   }
   
-  //Delete the given Note
-  public delete = async(body: Object): Promise<boolean> => {
-    const delete_Count = (await Note.deleteOne(body)).deletedCount;
+  //Update note by Id
+  public UpdateById = async (id: string, updateData: Object): Promise<Object | null> => {
+    const updated_Note = await Note.findByIdAndUpdate(
+        id,
+        updateData,
+        { new: true, useFindAndModify: false }
+    );
+    return updated_Note;
+}
+  
+//delete by Id
+  public deleteById = async (id: string): Promise<boolean> => {
+    const delete_Count = (await Note.deleteOne({ _id: id })).deletedCount;
     return delete_Count > 0;
   }
-
-  //Delete by Id
-  
 
 };
 
