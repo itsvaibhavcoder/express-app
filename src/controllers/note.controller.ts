@@ -17,8 +17,12 @@ class NoteController {
         data: create_note,
         message: 'Created the note'
       });
-    } catch (error) {
-      next(error);
+    } 
+    catch (error) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        code: HttpStatus.BAD_REQUEST,
+        message:  error.message
+      });
     }
   };
 
@@ -48,20 +52,27 @@ class NoteController {
     }
   };
 
+
   public getAll = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> => {
     try {
-      const notes = await this.NoteService.getAll();
+      console.log(req.body)
+      const UserID = req.body.UserID;
+      console.log("user Id--->", UserID)
+      const notes = await this.NoteService.getAll(UserID);
       res.status(HttpStatus.OK).json({
         code: HttpStatus.OK,
         data: notes,
         message: 'All Notes successfully recieved'
       });
-    } catch (error) {
-      next(error);
+    } 
+    catch (error) {
+      res.status(HttpStatus.BAD_REQUEST).json({
+        message: error.message
+      })
     }
   };
 
@@ -100,7 +111,6 @@ class NoteController {
       next(error);
     }
   };
-
 
   public deleteById = async (
     req: Request,
