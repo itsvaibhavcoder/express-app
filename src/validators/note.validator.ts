@@ -13,7 +13,7 @@ class NoteValidator {
         });
         const {error} = schema.validate(req.body);
         if(error){
-            next(error);
+            throw Error("Error"+ error.message);
         }
         next();
     };
