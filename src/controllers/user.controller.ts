@@ -36,7 +36,11 @@ class UserController {
     try {
       const user = await this.UserService.MatchCredential(req.body.email, req.body.password);
       if(user){
-        const generate_Token = await this.UserService.generateToken(req.body);
+        console.log("User-->", user);
+        const generate_Token = await this.UserService.generateToken({
+          UserID: user._id,
+          email: user.email
+        });
         const {firstName, email, ...rest_data} = user;
         res.status(HttpStatus.OK).json({
           code: HttpStatus.OK ,
