@@ -19,10 +19,11 @@ class NoteController {
       });
     } 
     catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({
-        code: HttpStatus.BAD_REQUEST,
-        message:  error.message
-      });
+      // res.status(HttpStatus.BAD_REQUEST).json({
+      //   code: HttpStatus.BAD_REQUEST,
+      //   message:  error.message
+      // });
+      next(error)
     }
   };
 
@@ -41,13 +42,15 @@ class NoteController {
           data: note,
           message: 'Note successfully recieved'
         });
-      } else {
+      } 
+      else {
         res.status(HttpStatus.NOT_FOUND).json({
           code: HttpStatus.NOT_FOUND,
           message: 'Note not found'
         });
       }
-    } catch (error) {
+    } 
+    catch (error) {
       next(error);
     }
   };
@@ -70,9 +73,10 @@ class NoteController {
       });
     } 
     catch (error) {
-      res.status(HttpStatus.BAD_REQUEST).json({
-        message: error.message
-      })
+      // res.status(HttpStatus.BAD_REQUEST).json({
+      //   message: error.message
+      // })
+      next(error)
     }
   };
 
