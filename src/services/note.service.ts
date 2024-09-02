@@ -17,10 +17,16 @@ class NoteService {
   };
 
   // Get all notes
-  public getAll = async(): Promise<INote[]>=>{
-      const notes = await Note.find().exec();
-      return notes;
+  public getAll = async(UserId: String): Promise<INote[]>=>{
+    try{
+     console.log("UserID --->", UserId);
+      return await Note.find({ UserId }).exec();
+    }
+    catch (error) {
+      console.error('Error fetching notes:', error);
+      throw error;
   }
+}
   
   // Update the present Note
   public Update = async(body: Object): Promise<Object> => {
