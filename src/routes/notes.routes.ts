@@ -32,13 +32,16 @@ class NoteRoutes {
         //Get the note by id not require useAuth
         this.router.get(
             '/:id',
-            this.NoteController.fetchNoteById
+            this.NoteValidater.validateIdMiddleware,
+            this.NoteController.getNoteById
         );
         
         //Update note by Id
         this.router.put(
-            '/update/:id',
+            '/:id',
             userAuth,
+            //Id validator
+            this.NoteValidater.validateIdMiddleware,
             this.NoteValidater.validate_note,
             this.NoteController.updateById
         );
@@ -47,6 +50,8 @@ class NoteRoutes {
         this.router.delete(
             '/:id',
             userAuth,
+            //Id validator
+            this.NoteValidater.validateIdMiddleware,
             this.NoteController.deleteById
         )
     }
