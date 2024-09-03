@@ -1,7 +1,7 @@
 import express, { IRouter } from 'express';
 import userController from '../controllers/user.controller';
 import userValidator from '../validators/user.validator';
-// import { userAuth } from '../middlewares/auth.middleware';
+import {userAuth} from '../middlewares/auth.middleware';
 import hashingFunction from '../hashing';
 
 class UserRoutes {
@@ -28,7 +28,20 @@ class UserRoutes {
       this.UserValidator.loginValidate,
       this.UserController.login,
     )
+
+    this.router.post(
+      '/forget-password',
+      this.UserValidator.emailValidate,
+      this.UserController.forgetPassword
+    )
+
+    this.router.post(
+      '/reset-password',
+      this.UserValidator.resetPasswordValidate,
+      this.UserController.resetPassword
+    )
   };
+  
 
   public getRoutes = (): IRouter => {
     return this.router;
