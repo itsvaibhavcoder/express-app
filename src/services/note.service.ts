@@ -17,9 +17,9 @@ class NoteService {
   };
 
   // Get all notes
-  public getAll = async(UserId: String): Promise<INote[]>=>{
+  public getAll = async(UserId: String): Promise<INote[]>=>{ 
     try{
-     console.log("UserID --->", UserId);
+      console.log("UserID --->", UserId);
       return await Note.find({ UserId }).exec();
     }
     catch (error) {
@@ -27,12 +27,6 @@ class NoteService {
       throw error;
   }
 }
-  
-  // Update the present Note
-  public Update = async(body: Object): Promise<Object> => {
-    const updated_Note = Note.updateOne(body);
-    return updated_Note;
-  }
   
   //Update note by Id
   public UpdateById = async (id: string, updateData: Object): Promise<Object | null> => {
