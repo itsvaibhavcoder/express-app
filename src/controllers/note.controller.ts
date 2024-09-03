@@ -27,7 +27,7 @@ class NoteController {
     }
   };
 
-  public fetchNoteById = async (
+  public getNoteById = async (
     req: Request,
     res: Response,
     next: NextFunction
@@ -66,6 +66,7 @@ class NoteController {
       const UserID = req.body.UserID;
       console.log("user Id--->", UserID)
       const notes = await this.NoteService.getAll(UserID);
+      console.log("Notes --->", notes);
       res.status(HttpStatus.OK).json({
         code: HttpStatus.OK,
         data: notes,
@@ -73,30 +74,14 @@ class NoteController {
       });
     } 
     catch (error) {
-      // res.status(HttpStatus.BAD_REQUEST).json({
-      //   message: error.message
-      // })
-      next(error)
+      res.status(HttpStatus.BAD_REQUEST).json({
+        message: error.message
+      })
+      //next(error)
     }
   };
 
-  public update = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const update_note = await this.NoteService.Update(req.body);
-      res.status(HttpStatus.CREATED).json({
-        code: HttpStatus.CREATED,
-        data: update_note,
-        message: 'Updated the note'
-      });
-    } catch (error) {
-      next(error);
-    }
-  };
-
+  
   //Update by Id
   public updateById = async (
     req: Request,
@@ -111,7 +96,8 @@ class NoteController {
         data: update_note,
         message: 'Updated the note'
       });
-    } catch (error) {
+    } 
+    catch (error) {
       next(error);
     }
   };
