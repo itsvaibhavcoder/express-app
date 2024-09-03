@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from 'express';
 
 class UserController {
   public UserService = new userService();
+
   public signUp = async (
     req: Request,
     res: Response,
@@ -68,7 +69,44 @@ class UserController {
       });
      }
     }
-  };
+
+    public forgetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const resetToken = await this.UserService.generatePasswordResetToken(req.body.email);
+        // Send the token via email or return it in the response
+        res.status(HttpStatus.OK).json({
+          code: HttpStatus.OK,
+          data: { resetToken },
+          message: 'Password reset token generated',
+        });
+      } 
+      catch (error) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          code: HttpStatus.BAD_REQUEST,
+          data: "",
+          message: error.message,
+        });
+      }
+    };
+   
+    public resetPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+      try {
+        const { token, newPassword } = req.body;
+        await this.UserService.resetPassword(token, newPassword);
+        res.status(HttpStatus.OK).json({
+          code: HttpStatus.OK,
+          data: "",
+          message: 'Password reset successful',
+        });
+      } catch (error) {
+        res.status(HttpStatus.BAD_REQUEST).json({
+          code: HttpStatus.BAD_REQUEST,
+          data: "",
+          message: error.message,
+        });
+      }
+    };
+};
 
 export default UserController;
 
