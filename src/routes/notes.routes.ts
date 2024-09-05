@@ -40,7 +40,6 @@ class NoteRoutes {
         this.router.put(
             '/:id',
             userAuth,
-            //Id validator
             this.NoteValidater.validateIdMiddleware,
             this.NoteValidater.validate_note,
             this.NoteController.updateById
@@ -54,8 +53,22 @@ class NoteRoutes {
             this.NoteValidater.validateIdMiddleware,
             this.NoteController.deleteById
         )
-    }
 
+        this.router.put(
+           '/isArchive/:id', //isTrash should not be true
+           userAuth,
+           this.NoteValidater.validateIdMiddleware,
+           this.NoteController.isArchive
+        )
+
+        this.router.put(
+            '/isTrash/:id',
+            userAuth,
+            this.NoteValidater.validateIdMiddleware,
+            this.NoteController.isTrash
+        )
+    }
+    
     public getRoutes = (): Router => {
         return this.router;
     };

@@ -9,7 +9,7 @@ import ErrorHandler from './middlewares/error.middleware';
 import Logger from './config/logger';
 import morgan from 'morgan';
 import swaggerUi from "swagger-ui-express";
-import swaggerDocument from './swagger.json';
+import swaggerDocument from './openai.json';
 class App{
   public app: Application;
   public host: string | number;

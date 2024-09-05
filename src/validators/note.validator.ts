@@ -22,15 +22,14 @@ class NoteValidator {
     next();
   };
 
-  // Middleware to validate the id
+  //Middleware to validate the id
   public validateIdMiddleware = (
     req: Request,
     res: Response,
     next: NextFunction
   ) => {
     const schema = Joi.object({
-      id: Joi.string()
-        .custom((value, helpers) => {
+      id: Joi.string().custom((value, helpers) => {
           if (!mongoose.Types.ObjectId.isValid(value)) {
             return helpers.error('any.invalid');
           }

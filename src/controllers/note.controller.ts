@@ -15,15 +15,14 @@ class NoteController {
       res.status(HttpStatus.CREATED).json({
         code: HttpStatus.CREATED,
         data: create_note,
-        message: 'Created the note'
+        message: 'Created the note 🎉'
       });
-    } 
-    catch (error) {
+    } catch (error) {
       // res.status(HttpStatus.BAD_REQUEST).json({
       //   code: HttpStatus.BAD_REQUEST,
       //   message:  error.message
       // });
-      next(error)
+      next(error);
     }
   };
 
@@ -40,21 +39,18 @@ class NoteController {
         res.status(HttpStatus.OK).json({
           code: HttpStatus.OK,
           data: note,
-          message: 'Note successfully recieved'
+          message: 'Note successfully recieved 👍'
         });
-      } 
-      else {
+      } else {
         res.status(HttpStatus.NOT_FOUND).json({
           code: HttpStatus.NOT_FOUND,
-          message: 'Note not found'
+          message: 'Note not found 😵'
         });
       }
-    } 
-    catch (error) {
+    } catch (error) {
       next(error);
     }
   };
-
 
   public getAll = async (
     req: Request,
@@ -62,26 +58,25 @@ class NoteController {
     next: NextFunction
   ): Promise<void> => {
     try {
-      console.log(req.body)
+      console.log(req.body);
       const UserID = req.body.UserID;
-      console.log("user Id--->", UserID)
+      console.log('user Id--->', UserID);
       const notes = await this.NoteService.getAll(UserID);
-      console.log("Notes --->", notes);
+      console.log('Notes --->', notes);
       res.status(HttpStatus.OK).json({
         code: HttpStatus.OK,
         data: notes,
-        message: 'All Notes successfully recieved'
+        message: 'All Notes successfully recieved 🫡'
       });
     } 
     catch (error) {
       res.status(HttpStatus.BAD_REQUEST).json({
         message: error.message
-      })
+      });
       //next(error)
     }
   };
 
-  
   //Update by Id
   public updateById = async (
     req: Request,
@@ -113,8 +108,56 @@ class NoteController {
       res.status(HttpStatus.OK).json({
         code: HttpStatus.OK,
         data: delete_note,
-        message: 'Deleted the note'
+        message: 'Deleted the note 😵'
       });
+    } 
+    catch (error) {
+      next(error);
+    }
+  };
+
+  public isArchive = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const note = await this.NoteService.toggleArchiveStatus(req.params.id);
+      if (note) {
+        res.status(HttpStatus.OK).json({
+          message: note.isArchived
+            ? 'Note is Archived 🫡'
+            : 'Note is Unarchived 🗑️'
+        });
+      } 
+      else {
+        res.status(HttpStatus.NOT_FOUND).json({
+          message: 'Note not found'
+        });
+      }
+    } 
+    catch (error) {
+      next(error);
+    }
+};
+
+  public isTrash = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> => {
+    try {
+      const note = await this.NoteService.toggleTrashStatus(req.params.id);
+      if (note) {
+        res.status(HttpStatus.OK).json({
+          message: note.isTrash ? 'Note is Trashed 🫡' : 'Note is Untrashed 🗑️'
+        });
+      } 
+      else {
+        res.status(HttpStatus.NOT_FOUND).json({
+          message: 'Note not found'
+        });
+      }
     } 
     catch (error) {
       next(error);
