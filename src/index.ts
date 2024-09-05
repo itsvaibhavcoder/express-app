@@ -8,7 +8,8 @@ import Database from './config/database';
 import ErrorHandler from './middlewares/error.middleware';
 import Logger from './config/logger';
 import morgan from 'morgan';
-
+import swaggerUi from "swagger-ui-express";
+import swaggerDocument from './swagger.json';
 class App{
   public app: Application;
   public host: string | number;
@@ -39,11 +40,13 @@ class App{
     this.app.use(express.urlencoded({ extended: true }));
     this.app.use(express.json());
     this.app.use(morgan('combined', { stream: this.logStream }));
+   
   }
   public initializeDatabase(): void {
     this.db.initializeDatabase();
   }
   public initializeRoutes(): void {
+    this.app.use(`/api/${this.api_version}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocument));
     this.app.use(`/api/${this.api_version}`, routes());
   }
   public initializeErrorHandlers(): void {
