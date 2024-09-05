@@ -13,7 +13,7 @@ async function sendEmail(email: string, token: string): Promise<void> {
 
     const mailOptions: SendMailOptions = {
         to: email,
-        from: 'sukalevaibhav53@gmail.com',
+        from: 'vaibhavsukale9449@gmail.com',
         subject: 'Password Reset',
         text: `Reset your password using this token: ${token}`,
     };
