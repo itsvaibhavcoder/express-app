@@ -1,6 +1,5 @@
 import mongoose from 'mongoose';
 import Logger from './logger';
-
 class Database {
   private DATABASE: string;
   private logger;
@@ -16,6 +15,7 @@ class Database {
 
   public initializeDatabase = async (): Promise<void> => {
     try {
+
       await mongoose.connect(this.DATABASE, {
         useFindAndModify: false,
         useCreateIndex: true,
