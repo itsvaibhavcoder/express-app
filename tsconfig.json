@@ -4,13 +4,13 @@
     "module": "commonjs",
     "allowJs": true,
     "outDir": "./build",
-    "rootDir": "./src",
+    "rootDir": ".",
     "esModuleInterop": true,
     "noImplicitAny": false,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "typeRoots": ["./node_modules/@types", "./src/types"]
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "src/tests"]
+  "include": ["src/**/*", "tests/**/*.ts"],
+  "exclude": ["node_modules"]
 }
