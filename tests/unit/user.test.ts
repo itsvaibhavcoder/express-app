@@ -2,9 +2,9 @@ import { expect, use } from 'chai';
 import request from 'supertest';
 import mongoose from 'mongoose';
 import HttpStatus from 'http-status-codes';
-import App from '../../src/index'; 
+import App from '../../src/index';
 import dotenv from 'dotenv';
-dotenv.config({ path: 'process.env.DATABASE_TEST' }); 
+dotenv.config({ path: 'process.env.DATABASE_TEST' });
 
 let jwtToken: string;
 const app = App.getApp();
@@ -18,29 +18,28 @@ describe('User APIs Test', () => {
     await mongoose.disconnect();
   });
 
-    describe('POST /api/v1/users/register', () => {
-      it('should return status 201 when a new user is added', async () => {
-        const userdetails = {
-          fName: 'Vaibhav',
-          lName: 'Sukale',
-          email: 'vaibhavsukale9449',
-          password: 'vaibhav@123'
-        };
-        console.log(userdetails.email)
-      
-        try {
-          const res = await request(app)
-            .post('/api/v1/users/register')
-            .send(userdetails)
-            .expect(HttpStatus.CREATED); 
-        
-          expect(res.body).to.have.property('_id'); 
-          expect(res.body).to.have.property('email', userdetails.email); 
-        } 
-        catch (error) {
-          console.error('Error during the test:', error); 
-        }
-      });
+  describe('POST /api/v1/users/register', () => {
+    it('should return status 201 when a new user is added', async () => {
+      const userdetails = {
+        fName: 'Vaibhav',
+        lName: 'Sukale',
+        email: 'vaibhavsukale9449',
+        password: 'vaibhav@123'
+      };
+      console.log(userdetails.email);
+
+      try {
+        const res = await request(app)
+          .post('/api/v1/users/register')
+          .send(userdetails)
+          .expect(HttpStatus.CREATED);
+
+        expect(res.body).to.have.property('_id');
+        expect(res.body).to.have.property('email', userdetails.email);
+      } catch (error) {
+        console.error('Error during the test:', error);
+      }
+    });
   });
 
   describe('POST /api/v1/users/login', () => {
@@ -51,24 +50,23 @@ describe('User APIs Test', () => {
       };
       try {
         const response = await request(app)
-        .post('/api/v1/users/login')
-        .send(userdetails)
-        .expect(HttpStatus.OK);
-      jwtToken = response.body.token; 
-      expect(jwtToken).to.be.a('string'); 
-      } 
-      catch (error) {
+          .post('/api/v1/users/login')
+          .send(userdetails)
+          .expect(HttpStatus.OK);
+        jwtToken = response.body.token;
+        expect(jwtToken).to.be.a('string');
+      } catch (error) {
         console.error('Error during the test:', error);
       }
     });
   });
-  
+
   describe('POST /api/v1/notes', () => {
     it('should return status 200 when a note is created', async () => {
       const noteDetails = {
         Title: 'Note Title',
-        Dest: 'email',
-        color: 'blue'
+        Dest: 'This is note',
+        color: 'black'
       };
       await request(app)
         .post('/api/v1/notes')
@@ -77,8 +75,88 @@ describe('User APIs Test', () => {
         .expect(HttpStatus.OK);
     });
   });
-  
-  
 
-  
+  // Test case for getting a note by ID
+  describe('GET /api/v1/notes/:id', () => {
+    it('should return status 200 and the note when a valid ID is provided', async () => {
+      const noteId = 'valid-note-id'; // Replace with actual note ID or generate one dynamically in your setup
+      const response = await request(app)
+        .get(`/api/v1/notes/${noteId}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK);
+        
+      expect(response.body).to.have.property('_id', noteId); // Ensure the returned note has the correct ID
+      expect(response.body).to.have.property('Title'); // Ensure the returned note has a title
+    });
+
+    it('should return status 404 when the note ID is not found', async () => {
+      const invalidNoteId = 'nonexistent-id';
+      await request(app)
+        .get(`/api/v1/notes/${invalidNoteId}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.NOT_FOUND); // Expect 404 when the note is not found
+    });
+  });
+
+  // Test case for deleting a note by ID
+  describe('DELETE /api/v1/notes/:id', () => {
+    it('should return status 200 when a note is deleted successfully', async () => {
+      const noteId = 'valid-note-id'; // Replace with actual note ID
+      await request(app)
+        .delete(`/api/v1/notes/${noteId}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.OK); // Expect 200 when the note is deleted
+
+      // Optionally, you can add a check to ensure the note no longer exists
+      await request(app)
+        .get(`/api/v1/notes/${noteId}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.NOT_FOUND);
+    });
+
+    it('should return status 404 when the note ID is not found for deletion', async () => {
+      const invalidNoteId = 'nonexistent-id';
+      await request(app)
+        .delete(`/api/v1/notes/${invalidNoteId}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .expect(HttpStatus.NOT_FOUND); // Expect 404 when the note is not found
+    });
+  });
+
+  // Test case for updating a note by ID
+  describe('PUT /api/v1/notes/:id', () => {
+    it('should return status 200 and update the note when a valid ID is provided', async () => {
+      const noteId = 'valid-note-id'; // Replace with actual note ID
+      const updatedNoteDetails = {
+        Title: 'Updated Note Title',
+        Dest: 'Updated note description',
+        color: 'blue'
+      };
+
+      const response = await request(app)
+        .put(`/api/v1/notes/${noteId}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(updatedNoteDetails)
+        .expect(HttpStatus.OK);
+
+      expect(response.body).to.have.property('_id', noteId); // Ensure the note ID matches
+      expect(response.body).to.have.property('Title', updatedNoteDetails.Title); // Check that the title is updated
+      expect(response.body).to.have.property('color', updatedNoteDetails.color); // Check that the color is updated
+    });
+
+    it('should return status 404 when the note ID is not found for update', async () => {
+      const invalidNoteId = 'nonexistent-id';
+      const updatedNoteDetails = {
+        Title: 'Updated Note Title',
+        Dest: 'Updated note description',
+        color: 'blue'
+      };
+
+      await request(app)
+        .put(`/api/v1/notes/${invalidNoteId}`)
+        .set('Authorization', `Bearer ${jwtToken}`)
+        .send(updatedNoteDetails)
+        .expect(HttpStatus.NOT_FOUND); // Expect 404 when the note is not found
+    });
+  });
 });
