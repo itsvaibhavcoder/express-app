@@ -3,7 +3,7 @@ import userController from '../controllers/user.controller';
 import userValidator from '../validators/user.validator';
 import {userAuth} from '../middlewares/auth.middleware';
 import hashingFunction from '../hashing';
-
+import { cacheMiddleware } from '../middlewares/cacheMiddleware';
 class UserRoutes {
   private UserController = new userController();
   private router = express.Router();
@@ -26,6 +26,7 @@ class UserRoutes {
     this.router.post(
       '/login', 
       this.UserValidator.loginValidate,
+      cacheMiddleware, //Added middleware
       this.UserController.login,
     )
 
