@@ -1,10 +1,10 @@
 import HttpStatus from 'http-status-codes';
 import noteService from '../services/note.service';
 import { Request, Response, NextFunction } from 'express';
-
+import redisClient from '../config/redisClient';
 class NoteController {
-  public NoteService = new noteService();
 
+  public NoteService = new noteService();
   public createNote = async (
     req: Request,
     res: Response,
@@ -12,12 +12,16 @@ class NoteController {
   ): Promise<void> => {
     try {
       const create_note = await this.NoteService.createNote(req.body);
+
+      //Cache note while creating
+      //await redisClient.set(create_note, JSON.stringify(create_note), {EX: 3600});
       res.status(HttpStatus.CREATED).json({
         code: HttpStatus.CREATED,
         data: create_note,
         message: 'Created the note 🎉'
       });
-    } catch (error) {
+    } 
+    catch (error) {
       // res.status(HttpStatus.BAD_REQUEST).json({
       //   code: HttpStatus.BAD_REQUEST,
       //   message:  error.message
@@ -34,20 +38,25 @@ class NoteController {
     try {
       const noteId = req.params.id.trim();
       const note = await this.NoteService.getSingleNote(noteId);
-
+       
       if (note) {
+        //Cache the note with 1 1-hour expiration
+        await redisClient.set(noteId, JSON.stringify(note), {EX: 3600});
+        console.log(`Note ${noteId} cached in Redis.`);
         res.status(HttpStatus.OK).json({
           code: HttpStatus.OK,
           data: note,
           message: 'Note successfully recieved 👍'
         });
-      } else {
+      } 
+      else {
         res.status(HttpStatus.NOT_FOUND).json({
           code: HttpStatus.NOT_FOUND,
           message: 'Note not found 😵'
         });
       }
-    } catch (error) {
+    } 
+    catch (error) {
       next(error);
     }
   };
@@ -73,7 +82,6 @@ class NoteController {
       res.status(HttpStatus.BAD_REQUEST).json({
         message: error.message
       });
-      //next(error)
     }
   };
 
@@ -86,6 +94,11 @@ class NoteController {
     try {
       const noteId = req.params.id.trim();
       const update_note = await this.NoteService.UpdateById(noteId, req.body);
+
+      //Store the note in redis
+      if(update_note){
+        await redisClient.set(noteId, JSON.stringify(update_note), {EX : 3600});
+      }
       res.status(HttpStatus.CREATED).json({
         code: HttpStatus.CREATED,
         data: update_note,

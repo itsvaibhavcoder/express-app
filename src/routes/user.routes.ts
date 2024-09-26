@@ -38,13 +38,11 @@ class UserRoutes {
 
     this.router.post(
       '/reset-password',
-      userAuth,
       this.UserValidator.resetPasswordValidate,
       this.UserController.resetPassword
     )
   };
   
-
   public getRoutes = (): IRouter => {
     return this.router;
   };

@@ -2,7 +2,7 @@ import express, {Router} from 'express';
 import noteController from '../controllers/note.controller';
 import noteValidator from '../validators/note.validator';
 import { userAuth } from '../middlewares/auth.middleware';
-
+import { cacheNoteMiddleware } from '../middlewares/cacheMiddleware';
 class NoteRoutes {
     private NoteController = new noteController();
     private router = express.Router();
@@ -32,6 +32,7 @@ class NoteRoutes {
         //Get the note by id not require useAuth
         this.router.get(
             '/:id',
+            cacheNoteMiddleware,
             this.NoteValidater.validateIdMiddleware,
             this.NoteController.getNoteById
         );
@@ -40,6 +41,7 @@ class NoteRoutes {
         this.router.put(
             '/:id',
             userAuth,
+            cacheNoteMiddleware,
             this.NoteValidater.validateIdMiddleware,
             this.NoteValidater.validate_note,
             this.NoteController.updateById
@@ -49,7 +51,6 @@ class NoteRoutes {
         this.router.delete(
             '/:id',
             userAuth,
-            //Id validator
             this.NoteValidater.validateIdMiddleware,
             this.NoteController.deleteById
         )

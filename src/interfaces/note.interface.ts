@@ -6,5 +6,5 @@ export interface INote extends Document {
   color: string;
   isArchived: boolean;
   isTrash: boolean;
-  UserID: string
+  UserID: String
 }

@@ -14,11 +14,11 @@ class NoteService {
     return note;
   };
 
-  // Get all notes
-  public getAll = async (UserId: String): Promise<INote[]> => {
+  //Get all notes
+  public getAll = async (UserID: String): Promise<INote[]> => {
     try {
-      console.log('UserID --->', UserId);
-      return await Note.find({ UserId }).exec();
+      console.log('UserID --->', UserID);
+      return await Note.find({ UserID }).exec();
     } catch (error) {
       console.error('Error fetching notes:', error);
       throw error;
