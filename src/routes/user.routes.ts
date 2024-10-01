@@ -26,7 +26,7 @@ class UserRoutes {
     this.router.post(
       '/login', 
       this.UserValidator.loginValidate,
-      cacheMiddleware, //Added middleware
+      cacheMiddleware,
       this.UserController.login,
     )
 
